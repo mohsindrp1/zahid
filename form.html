@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styled Form to PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+      color: #ffffff;
+      background-color: #007bff;
+      padding: 15px 0;
+      margin: 0 0 20px;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    input[type="radio"] {
+      width: auto;
+      margin-right: 5px;
+    }
+    button {
+      background-color: #28a745;
+      color: #ffffff;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #pdfContent {
+      background: #e9f5ff;
+      color: #333;
+      max-width: 600px;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 2px solid #007bff;
+    }
+    #pdfContent .field {
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    #pdfContent h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Student Details Form</h2>
+  <form id="studentForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required>
+
+    <label>Gender:</label>
+    <label><input type="radio" name="gender" value="Male" required> Male</label>
+    <label><input type="radio" name="gender" value="Female"> Female</label>
+    <label><input type="radio" name="gender" value="Other"> Other</label>
+
+    <label for="fatherName">Father's Name:</label>
+    <input type="text" id="fatherName" placeholder="Enter father's name" required>
+
+    <label for="motherName">Mother's Name:</label>
+    <input type="text" id="motherName" placeholder="Enter mother's name" required>
+
+    <label for="mobile">Mobile Number (with Country Code):</label>
+    <input type="text" id="mobile" placeholder="e.g., +91 9876543210" required>
+
+    <label for="email">Email Address:</label>
+    <input type="email" id="email" placeholder="Enter your email" required>
+
+    <label for="age">Age:</label>
+    <input type="number" id="age" placeholder="Enter your age" required>
+
+    <label for="address">Address:</label>
+    <textarea id="address" placeholder="Enter your address" required></textarea>
+
+    <label for="city">City Name:</label>
+    <input type="text" id="city" placeholder="Enter your city" required>
+
+    <label for="college">College:</label>
+    <input type="text" id="college" placeholder="Enter your college name" required>
+
+    <label for="class10">Class 10 Percentage:</label>
+    <input type="text" id="class10" placeholder="Enter percentage" required>
+
+    <label for="class12">Class 12 Percentage:</label>
+    <input type="text" id="class12" placeholder="Enter percentage" required>
+
+    <label for="graduation">Graduation Percentage:</label>
+    <input type="text" id="graduation" placeholder="Enter percentage" required>
+
+    <button type="button" onclick="generatePDF()">Download PDF</button>
+  </form>
+
+  <div id="pdfContent">
+    <h2>Student Details</h2>
+    <div class="field"><strong>Name:</strong> <span id="pdfName"></span></div>
+    <div class="field"><strong>Gender:</strong> <span id="pdfGender"></span></div>
+    <div class="field"><strong>Father's Name:</strong> <span id="pdfFatherName"></span></div>
+    <div class="field"><strong>Mother's Name:</strong> <span id="pdfMotherName"></span></div>
+    <div class="field"><strong>Mobile:</strong> <span id="pdfMobile"></span></div>
+    <div class="field"><strong>Email:</strong> <span id="pdfEmail"></span></div>
+    <div class="field"><strong>Age:</strong> <span id="pdfAge"></span></div>
+    <div class="field"><strong>Address:</strong> <span id="pdfAddress"></span></div>
+    <div class="field"><strong>City:</strong> <span id="pdfCity"></span></div>
+    <div class="field"><strong>College:</strong> <span id="pdfCollege"></span></div>
+    <div class="field"><strong>Class 10 Percentage:</strong> <span id="pdfClass10"></span></div>
+    <div class="field"><strong>Class 12 Percentage:</strong> <span id="pdfClass12"></span></div>
+    <div class="field"><strong>Graduation Percentage:</strong> <span id="pdfGraduation"></span></div>
+  </div>
+
+  <script>
+    async function generatePDF() {
+      const name = document.getElementById('name').value;
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const fatherName = document.getElementById('fatherName').value;
+      const motherName = document.getElementById('motherName').value;
+      const mobile = document.getElementById('mobile').value;
+      const email = document.getElementById('email').value;
+      const age = document.getElementById('age').value;
+      const address = document.getElementById('address').value;
+      const city = document.getElementById('city').value;
+      const college = document.getElementById('college').value;
+      const class10 = document.getElementById('class10').value;
+      const class12 = document.getElementById('class12').value;
+      const graduation = document.getElementById('graduation').value;
+
+      document.getElementById('pdfName').textContent = name;
+      document.getElementById('pdfGender').textContent = gender;
+      document.getElementById('pdfFatherName').textContent = fatherName;
+      document.getElementById('pdfMotherName').textContent = motherName;
+      document.getElementById('pdfMobile').textContent = mobile;
+      document.getElementById('pdfEmail').textContent = email;
+      document.getElementById('pdfAge').textContent = age;
+      document.getElementById('pdfAddress').textContent = address;
+      document.getElementById('pdfCity').textContent = city;
+      document.getElementById('pdfCollege').textContent = college;
+      document.getElementById('pdfClass10').textContent = class10;
+      document.getElementById('pdfClass12').textContent = class12;
+      document.getElementById('pdfGraduation').textContent = graduation;
+
+      const pdfContent = document.getElementById('pdfContent');
+      const canvas = await html2canvas(pdfContent);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jspdf.jsPDF();
+      pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+      pdf.save("Student_Details.pdf");
+    }
+  </script>
+</body>
+</html>
